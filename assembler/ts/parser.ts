@@ -4,7 +4,7 @@ enum CommandType {
   L_COMMAND,
 }
 
-class Parser {
+export class Parser {
   currentCommand: string;
   constructor() {}
 
