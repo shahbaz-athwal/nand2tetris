@@ -5,18 +5,31 @@ enum CommandType {
 }
 
 export class Parser {
-  currentCommand: string;
-  constructor() {}
+  currentCommand: string = "";
+  private lines: string[];
+  private cursor: number = 0;
 
-  hasMoreCommand(): boolean {
-    return false;
+  constructor(fileContent: string) {
+    this.lines = fileContent.split(/\r?\n/);
   }
 
-  advance() {
-    if (!this.hasMoreCommand()) {
-      return;
+  async advance(): Promise<boolean> {
+    while (this.cursor < this.lines.length) {
+      const line = this.lines[this.cursor++];
+
+      // 1. Remove comments (anything after //)
+      // 2. Remove all whitespace
+      const cleaned = line!.split("//")[0]!.replace(/\s+/g, "");
+
+      // If the line is empty (was just a comment or whitespace), skip it
+      if (cleaned === "") {
+        continue;
+      }
+
+      this.currentCommand = cleaned;
+      return true;
     }
-    // this.currentCommand = nextCommand
+    return false; // Reached end of file
   }
 
   commandType(): CommandType {
@@ -49,7 +62,7 @@ export class Parser {
     if (!hasDest) {
       throw Error("No destination in the command.");
     }
-    return this.currentCommand.split("=")[0].split("").sort().join("");
+    return this.currentCommand.split("=")[0]!;
   }
 
   comp() {
@@ -60,15 +73,15 @@ export class Parser {
     const hasJump = this.currentCommand.includes(";");
 
     if (hasDest && hasJump) {
-      return this.currentCommand.split("=")[1].split(";")[0];
+      return this.currentCommand.split("=")[1]!.split(";")[0]!;
     }
 
     if (hasDest) {
-      return this.currentCommand.split("=")[1];
+      return this.currentCommand.split("=")[1]!;
     }
 
     if (hasJump) {
-      return this.currentCommand.split(";")[0];
+      return this.currentCommand.split(";")[0]!;
     }
     return this.currentCommand;
   }
@@ -81,6 +94,10 @@ export class Parser {
     if (!hasJump) {
       throw Error("No jump in the command.");
     }
-    return this.currentCommand.split(";")[1];
+    return this.currentCommand.split(";")[1]!;
+  }
+
+  print() {
+    console.log(this.currentCommand);
   }
 }
