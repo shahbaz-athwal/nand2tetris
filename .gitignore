@@ -4,6 +4,7 @@ projects
 
 # output
 out
+build
 dist
 *.tgz
 
