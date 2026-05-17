@@ -1,4 +1,4 @@
-enum CommandType {
+export enum CommandType {
   A_COMMAND,
   C_COMMAND,
   L_COMMAND,
@@ -6,8 +6,9 @@ enum CommandType {
 
 export class Parser {
   currentCommand: string = "";
+  instructionAddress = 0;
   private lines: string[];
-  private cursor: number = 0;
+  private cursor = 0;
 
   constructor(fileContent: string) {
     this.lines = fileContent.split(/\r?\n/);
@@ -21,15 +22,17 @@ export class Parser {
       // 2. Remove all whitespace
       const cleaned = line!.split("//")[0]!.replace(/\s+/g, "");
 
-      // If the line is empty (was just a comment or whitespace), skip it
       if (cleaned === "") {
         continue;
       }
 
       this.currentCommand = cleaned;
+      if (this.commandType() !== CommandType.L_COMMAND) {
+        this.instructionAddress++;
+      }
       return true;
     }
-    return false; // Reached end of file
+    return false;
   }
 
   commandType(): CommandType {
@@ -60,7 +63,8 @@ export class Parser {
     }
     const hasDest = this.currentCommand.includes("=");
     if (!hasDest) {
-      throw Error("No destination in the command.");
+      // throw Error("No destination in the command.");
+      return "null";
     }
     return this.currentCommand.split("=")[0]!;
   }
@@ -92,9 +96,16 @@ export class Parser {
     }
     const hasJump = this.currentCommand.includes(";");
     if (!hasJump) {
-      throw Error("No jump in the command.");
+      // throw Error("No jump in the command.");
+      return "null";
     }
     return this.currentCommand.split(";")[1]!;
+  }
+
+  resetCursor() {
+    this.cursor = 0;
+    this.currentCommand = "";
+    this.instructionAddress = 0;
   }
 
   print() {
