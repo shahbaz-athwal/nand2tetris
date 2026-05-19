@@ -53,3 +53,21 @@ char *dest_str(const char *buffer) {
   dest[len] = '\0';
   return dest;
 }
+
+// char *comp_str(const char *buffer) {
+//   assert(command_type(buffer) == C_COMMAND);
+// }
+
+char *jmp_str(const char *buffer) {
+  assert(command_type(buffer) == C_COMMAND);
+  char *jmp_start = strchr(buffer, ';');
+  if (!jmp_start) {
+    return NULL;
+  }
+
+  int len = strlen(jmp_start + 1);
+  char *jmp = (char *)malloc((len + 1) * sizeof(char));
+  strncpy(jmp, jmp_start + 1, len);
+  jmp[len] = '\0';
+  return jmp;
+}

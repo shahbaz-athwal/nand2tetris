@@ -43,15 +43,22 @@ int main(int argc, char *argv[]) {
     //   putchar('\n');
     //   free(sym);
     // }
+    if (buffer[0] != '\0') {
+      printf("%s\n", buffer);
+    }
+    //
     if (command_type(buffer) == C_COMMAND) {
       char *dest = dest_str(buffer);
-      printf("Dest: %s", dest);
-      putchar('\n');
+      if (dest) {
+        printf("Dest: %s\n", dest);
+      }
+      char *jmp = jmp_str(buffer);
+      if (jmp) {
+        printf("JMP: %s\n", jmp);
+      }
+
       free(dest);
-    }
-    printf("%s", buffer);
-    if (buffer[0] != '\0') {
-      putchar('\n');
+      free(jmp);
     }
   }
 
