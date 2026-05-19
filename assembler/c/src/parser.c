@@ -54,10 +54,6 @@ char *dest_str(const char *buffer) {
   return dest;
 }
 
-// char *comp_str(const char *buffer) {
-//   assert(command_type(buffer) == C_COMMAND);
-// }
-
 char *jmp_str(const char *buffer) {
   assert(command_type(buffer) == C_COMMAND);
   char *jmp_start = strchr(buffer, ';');
@@ -70,4 +66,32 @@ char *jmp_str(const char *buffer) {
   strncpy(jmp, jmp_start + 1, len);
   jmp[len] = '\0';
   return jmp;
+}
+
+char *comp_str(const char *buffer) {
+  assert(command_type(buffer) == C_COMMAND);
+
+  char *des_end = strchr(buffer, '=');
+  char *jmp_start = strchr(buffer, ';');
+
+  const char *start;
+  const char *end;
+  if (des_end == NULL) {
+    start = buffer;
+  } else {
+    start = des_end + 1;
+  }
+
+  if (jmp_start == NULL) {
+    end = buffer + strlen(buffer);
+  } else {
+    end = jmp_start;
+  }
+
+  int size = end - start;
+
+  char *comp = (char *)malloc((size + 1) * sizeof(char));
+  strncpy(comp, start, size);
+  comp[size] = '\0';
+  return comp;
 }

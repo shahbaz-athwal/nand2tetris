@@ -48,17 +48,23 @@ int main(int argc, char *argv[]) {
     }
     //
     if (command_type(buffer) == C_COMMAND) {
+      putchar('\n');
+
       char *dest = dest_str(buffer);
       if (dest) {
         printf("Dest: %s\n", dest);
       }
       char *jmp = jmp_str(buffer);
       if (jmp) {
-        printf("JMP: %s\n", jmp);
+        printf("JUMP: %s\n", jmp);
       }
+      char *comp = comp_str(buffer);
+      printf("COMP: %s\n", comp);
 
       free(dest);
       free(jmp);
+      free(comp);
+      putchar('\n');
     }
   }
 
