@@ -1,6 +1,6 @@
-import { CodeTranslator } from "./src/code";
-import { CommandType, Parser } from "../parser";
-import { SymbolTable } from "../symbol-table";
+import { CodeTranslator } from "./code";
+import { CommandType, Parser } from "./parser";
+import { SymbolTable } from "./symbol-table";
 
 const file = Bun.file("../../projects/6/pong/Pong.asm");
 const text = await file.text();

@@ -1,3 +1,4 @@
+#include "parser.c"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +37,12 @@ int main(int argc, char *argv[]) {
   char buffer[256];
   while (fgets(buffer, sizeof(buffer), file)) {
     clean_line(buffer);
+    if (command_type(buffer) != C_COMMAND) {
+      char *sym = symbol(buffer);
+      printf("%s", sym);
+      putchar('\n');
+      free(sym);
+    }
     printf("%s", buffer);
     if (buffer[0] != '\0') {
       putchar('\n');

@@ -6,7 +6,7 @@ SRCS = $(wildcard src/*.c)
 all: $(TARGET)
 
 $(TARGET): $(SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -o $(TARGET)
+	$(CC) $(CFLAGS) src/main.c -o $(TARGET)
 
 clean:
 	rm -f $(TARGET)
