@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Debug Assembler",
+    "build": {
+      "command": "make",
+      "args": [],
+      "cwd": "$ZED_WORKTREE_ROOT/assembler/c",
+    },
+    "program": "$ZED_WORKTREE_ROOT/assembler/c/build/assembler",
+    "args": ["$ZED_WORKTREE_ROOT/assembler/c/test/Rect.asm"],
+    "request": "launch",
+    "adapter": "CodeLLDB",
+  },
+]
