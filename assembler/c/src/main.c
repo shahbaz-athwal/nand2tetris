@@ -37,11 +37,17 @@ int main(int argc, char *argv[]) {
   char buffer[256];
   while (fgets(buffer, sizeof(buffer), file)) {
     clean_line(buffer);
-    if (command_type(buffer) != C_COMMAND) {
-      char *sym = symbol(buffer);
-      printf("%s", sym);
+    // if (command_type(buffer) != C_COMMAND) {
+    //   char *sym = symbol_str(buffer);
+    //   printf("%s", sym);
+    //   putchar('\n');
+    //   free(sym);
+    // }
+    if (command_type(buffer) == C_COMMAND) {
+      char *dest = dest_str(buffer);
+      printf("Dest: %s", dest);
       putchar('\n');
-      free(sym);
+      free(dest);
     }
     printf("%s", buffer);
     if (buffer[0] != '\0') {

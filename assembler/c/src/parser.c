@@ -1,9 +1,14 @@
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-typedef enum { A_COMMAND, C_COMMAND, L_COMMAND } CommandType;
+typedef enum { A_COMMAND, C_COMMAND, L_COMMAND, SKIP = -1 } CommandType;
 
 CommandType command_type(const char *buffer) {
+  if (buffer == NULL || buffer[0] == '\0') {
+    return SKIP;
+  }
+
   if (buffer[0] == '@') {
     return A_COMMAND;
   } else if (buffer[0] == '(') {
@@ -13,7 +18,7 @@ CommandType command_type(const char *buffer) {
   }
 }
 
-char *symbol(const char *buffer) {
+char *symbol_str(const char *buffer) {
   int type = command_type(buffer);
   assert(type != C_COMMAND);
 
@@ -34,4 +39,17 @@ char *symbol(const char *buffer) {
     sub_string[str_len] = '\0';
   }
   return sub_string;
+}
+
+char *dest_str(const char *buffer) {
+  assert(command_type(buffer) == C_COMMAND);
+  char *des_end = strchr(buffer, '=');
+  if (!des_end) {
+    return NULL;
+  }
+  int len = des_end - buffer;
+  char *dest = (char *)malloc((len + 1) * sizeof(char));
+  strncpy(dest, buffer, len);
+  dest[len] = '\0';
+  return dest;
 }
