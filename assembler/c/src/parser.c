@@ -2,6 +2,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+void clean_line(char *buffer) {
+  int read = 0;
+  int write = 0;
+
+  while (buffer[read] != '\0') {
+    if (buffer[read] == '/' && buffer[read + 1] == '/') {
+      break;
+    }
+    if (buffer[read] != ' ' && buffer[read] != '\n' && buffer[read] != '\r' &&
+        buffer[read] != '\t') {
+      buffer[write] = buffer[read];
+      write++;
+    }
+    read++;
+  }
+
+  buffer[write] = '\0';
+}
+
 typedef enum { A_COMMAND, C_COMMAND, L_COMMAND, SKIP = -1 } CommandType;
 
 CommandType command_type(const char *buffer) {

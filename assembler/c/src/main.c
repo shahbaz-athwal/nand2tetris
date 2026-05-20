@@ -1,26 +1,8 @@
+#include "code-translator.c"
 #include "parser.c"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-void clean_line(char *buffer) {
-  int read = 0;
-  int write = 0;
-
-  while (buffer[read] != '\0') {
-    if (buffer[read] == '/' && buffer[read + 1] == '/') {
-      break;
-    }
-    if (buffer[read] != ' ' && buffer[read] != '\n' && buffer[read] != '\r' &&
-        buffer[read] != '\t') {
-      buffer[write] = buffer[read];
-      write++;
-    }
-    read++;
-  }
-
-  buffer[write] = '\0';
-}
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
