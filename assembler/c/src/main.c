@@ -1,28 +1,11 @@
 #include "code-translator.c"
 #include "parser.c"
-#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-char *sym_to_a_inst(char *sym) {
-  int n = atoi(sym);
-  assert(n < 32768);
-  char *binary = (char *)malloc(17 * sizeof(char));
-
-  for (int i = 15; i >= 1; i--) {
-    if ((n >> i) & 1) {
-      binary[i] = '1';
-    } else {
-      binary[i] = '0';
-    }
-  }
-  binary[0] = '0';
-  binary[16] = '\0';
-  return binary;
-}
-
+#ifndef TEST_MODE
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     printf("Usage: %s <input_file>\n", argv[0]);
@@ -66,3 +49,4 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+#endif

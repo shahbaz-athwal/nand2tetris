@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -83,4 +84,16 @@ char *comp_code(const char *buffer) {
     }
   }
   return "000000";
+}
+
+char *sym_to_a_inst(char *sym) {
+  int n = atoi(sym);
+  assert(n < 32768);
+  char *binary = (char *)malloc(17 * sizeof(char));
+
+  for (int i = 15; i >= 0; i--) {
+    binary[15 - i] = ((n >> i) & 1) ? '1' : '0';
+  }
+  binary[16] = '\0';
+  return binary;
 }
