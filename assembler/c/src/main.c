@@ -1,8 +1,27 @@
 #include "code-translator.c"
 #include "parser.c"
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+char *sym_to_a_inst(char *sym) {
+  int n = atoi(sym);
+  assert(n < 32768);
+  char *binary = (char *)malloc(17 * sizeof(char));
+
+  for (int i = 15; i >= 1; i--) {
+    if ((n >> i) & 1) {
+      binary[i] = '1';
+    } else {
+      binary[i] = '0';
+    }
+  }
+  binary[0] = '0';
+  binary[16] = '\0';
+  return binary;
+}
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
@@ -19,29 +38,22 @@ int main(int argc, char *argv[]) {
   char buffer[256];
   while (fgets(buffer, sizeof(buffer), file)) {
     clean_line(buffer);
-    // if (command_type(buffer) != C_COMMAND) {
-    //   char *sym = symbol_str(buffer);
-    //   printf("%s", sym);
-    //   putchar('\n');
-    //   free(sym);
-    // }
-    if (buffer[0] != '\0') {
-      printf("%s\n", buffer);
+    if (buffer[0] == '\0') {
+      continue;
     }
-    //
+
+    if (command_type(buffer) == A_COMMAND) {
+
+      char *sym = symbol_str(buffer);
+      char *a_inst = sym_to_a_inst(sym);
+      free(sym);
+    }
+
     if (command_type(buffer) == C_COMMAND) {
-      putchar('\n');
 
       char *dest = dest_str(buffer);
-      if (dest) {
-        printf("Dest: %s\n", dest);
-      }
       char *jmp = jmp_str(buffer);
-      if (jmp) {
-        printf("JUMP: %s\n", jmp);
-      }
       char *comp = comp_str(buffer);
-      printf("COMP: %s\n", comp);
 
       free(dest);
       free(jmp);
