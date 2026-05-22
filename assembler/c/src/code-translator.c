@@ -7,6 +7,10 @@ typedef struct {
   char *code;
 } Mapping;
 
+static const Mapping dest_table[] = {
+    {"", "000"},  {"M", "001"},  {"D", "010"},  {"MD", "011"},
+    {"A", "100"}, {"AM", "101"}, {"AD", "110"}, {"AMD", "111"}};
+
 static const Mapping jump_table[] = {
     {"JGT", "001"}, {"JEQ", "010"}, {"JGE", "011"}, {"JLT", "100"},
     {"JNE", "101"}, {"JLE", "110"}, {"JMP", "111"}};
@@ -44,46 +48,49 @@ static const Mapping comp_table[] = {
     {"D&M", "1000000"},
     {"D|M", "1010101"}};
 
-char *dest_code(const char *buffer) {
-  char *code = (char *)malloc(4 * sizeof(char));
-  strcpy(code, "000");
-
-  if (buffer == NULL) {
-    return code;
-  }
-  if (strchr(buffer, 'A')) {
-    code[0] = '1';
-  }
-  if (strchr(buffer, 'D')) {
-    code[1] = '1';
-  }
-  if (strchr(buffer, 'M')) {
-    code[2] = '1';
-  }
-  return code;
-}
-
-char *jump_code(const char *buffer) {
+char *dest_code(char *buffer) {
   if (buffer == NULL) {
     return "000";
   }
 
-  for (int i = 0; i < 8; i++) {
-    if (strcmp(jump_table[i].mnemonic, buffer) == 0) {
-      return jump_table[i].code;
+  int num_entries = sizeof(dest_table) / sizeof(dest_table[0]);
+  for (int i = 0; i < num_entries; i++) {
+    if (strcmp(dest_table[i].mnemonic, buffer) == 0) {
+      free(buffer);
+      return dest_table[i].code;
     }
   }
+
+  free(buffer);
   return "000";
 }
 
-char *comp_code(const char *buffer) {
+char *jmp_code(char *buffer) {
+  if (buffer == NULL) {
+    return "000";
+  }
+  int num_entries = sizeof(jump_table) / sizeof(jump_table[0]);
+
+  for (int i = 0; i < num_entries; i++) {
+    if (strcmp(jump_table[i].mnemonic, buffer) == 0) {
+      free(buffer);
+      return jump_table[i].code;
+    }
+  }
+  free(buffer);
+  return "000";
+}
+
+char *comp_code(char *buffer) {
   int num_entries = sizeof(comp_table) / sizeof(comp_table[0]);
   for (int i = 0; i < num_entries; i++) {
     if (strcmp(comp_table[i].mnemonic, buffer) == 0) {
+      free(buffer);
       return comp_table[i].code;
     }
   }
-  return "000000";
+  free(buffer);
+  return "0000000";
 }
 
 char *sym_to_a_inst(char *sym) {
@@ -94,6 +101,17 @@ char *sym_to_a_inst(char *sym) {
   for (int i = 15; i >= 0; i--) {
     binary[15 - i] = ((n >> i) & 1) ? '1' : '0';
   }
+  binary[16] = '\0';
+  return binary;
+}
+
+char *build_c_inst(char *dest, char *jump, char *comp) {
+  char *binary = (char *)malloc(17 * sizeof(char));
+
+  strncpy(binary, "111", 3);
+  strncpy(binary + 3, comp, 7);
+  strncpy(binary + 10, dest, 3);
+  strncpy(binary + 13, jump, 3);
   binary[16] = '\0';
   return binary;
 }
