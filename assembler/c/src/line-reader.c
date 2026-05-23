@@ -8,7 +8,7 @@ typedef struct {
   char *line_buffer;
   size_t buffer_size;
   ssize_t read_line_size;
-  bool had_cached_line;
+  bool has_cached_line;
 } LineReader;
 
 LineReader *lr_open(char *file_name) {
@@ -24,9 +24,45 @@ LineReader *lr_open(char *file_name) {
   }
 
   lr->fp = fp;
+  lr->line_buffer = NULL;
   lr->buffer_size = 0;
   lr->read_line_size = -1;
-  lr->read_line_size = false;
+  lr->has_cached_line = false;
 
   return lr;
+}
+
+bool has_more_lines(LineReader *lr) {
+  if (!lr)
+    return false;
+
+  if (lr->has_cached_line)
+    return true;
+
+  lr->read_line_size = getline(&lr->line_buffer, &lr->buffer_size, lr->fp);
+
+  if (lr->read_line_size != -1) {
+    lr->has_cached_line = true;
+    return true;
+  }
+
+  return false;
+}
+
+char *next_line(LineReader *lr) {
+  if (!has_more_lines(lr)) {
+    return NULL;
+  }
+  lr->has_cached_line = false;
+  return lr->line_buffer;
+}
+
+void lr_close(LineReader *lr) {
+  if (lr) {
+    if (lr->fp) {
+      fclose(lr->fp);
+    }
+    free(lr);
+    free(lr->line_buffer);
+  }
 }
