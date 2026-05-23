@@ -57,12 +57,24 @@ char *next_line(LineReader *lr) {
   return lr->line_buffer;
 }
 
-void lr_close(LineReader *lr) {
-  if (lr) {
-    if (lr->fp) {
-      fclose(lr->fp);
-    }
-    free(lr);
-    free(lr->line_buffer);
+void lr_reset(LineReader *lr) {
+  if (lr)
+    return;
+
+  if (lr->fp) {
+    rewind(lr->fp);
   }
+  lr->has_cached_line = false;
+  lr->read_line_size = -1;
+}
+
+void lr_close(LineReader *lr) {
+  if (lr)
+    return;
+
+  if (lr->fp) {
+    fclose(lr->fp);
+  }
+  free(lr);
+  free(lr->line_buffer);
 }
