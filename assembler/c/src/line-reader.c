@@ -11,6 +11,7 @@ typedef struct {
   size_t buffer_size;
   ssize_t read_line_size;
   bool has_cached_line;
+  int line_address;
   LineFilterFn filter;
 } LineReader;
 
@@ -32,6 +33,7 @@ LineReader *lr_open(char *file_name, LineFilterFn filter) {
   lr->read_line_size = -1;
   lr->has_cached_line = false;
   lr->filter = filter;
+  lr->line_address = 0;
 
   return lr;
 }
@@ -50,6 +52,7 @@ bool has_more_lines(LineReader *lr) {
     }
     if (lr->line_buffer[0] != '\0') {
       lr->has_cached_line = true;
+      lr->line_address++;
       return true;
     }
   };
@@ -66,7 +69,7 @@ char *next_line(LineReader *lr) {
 }
 
 void lr_reset(LineReader *lr) {
-  if (lr)
+  if (!lr)
     return;
 
   if (lr->fp) {
@@ -74,6 +77,7 @@ void lr_reset(LineReader *lr) {
   }
   lr->has_cached_line = false;
   lr->read_line_size = -1;
+  lr->line_address = 0;
 }
 
 void lr_close(LineReader *lr) {
@@ -83,6 +87,6 @@ void lr_close(LineReader *lr) {
   if (lr->fp) {
     fclose(lr->fp);
   }
-  free(lr);
   free(lr->line_buffer);
+  free(lr);
 }

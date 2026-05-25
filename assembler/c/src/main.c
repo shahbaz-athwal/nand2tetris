@@ -1,5 +1,6 @@
 #include "code-translator.c"
 #include "file-writer.c"
+#include "line-reader.c"
 #include "parser.c"
 #include <stdint.h>
 #include <stdio.h>
@@ -37,44 +38,49 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  FILE *src_file = fopen(argv[1], "r");
-  if (src_file == NULL) {
-    printf("Error: could not open file %s\n", argv[1]);
-    return 1;
-  }
+  LineReader *lr = lr_open(argv[1], clean_line);
 
   char *out_name = output_file_name(argv[1]);
   FILE *dest_file = fopen(out_name, "w");
   free(out_name);
 
-  char buffer[256];
-  while (fgets(buffer, sizeof(buffer), src_file)) {
-    clean_line(buffer);
-    if (buffer[0] == '\0') {
+  char *instruction[17];
+
+  // First pass: find L instructions
+  while (has_more_lines(lr)) {
+    const char *line = next_line(lr);
+
+    if (command_type(line) != L_COMMAND) {
       continue;
     }
+    // if seen then skip otherwise add to symbol table.
+  }
+  // Second pass: find variables
+  lr_reset(lr);
+  while (has_more_lines(lr)) {
+  }
+  // Third pass: writer
+  lr_reset(lr);
+  while (has_more_lines(lr)) {
 
-    if (command_type(buffer) == A_COMMAND) {
-      char *sym = symbol_str(buffer);
-      char *a_inst = sym_to_a_inst(sym);
-      write_line(dest_file, a_inst);
-      free(a_inst);
-      free(sym);
+    const char *line = next_line(lr);
+
+    if (command_type(line) == A_COMMAND) {
+      cpy_a_inst(instruction, line);
     }
 
-    if (command_type(buffer) == C_COMMAND) {
+    if (command_type(line) == C_COMMAND) {
+      cpy_c_inst(instruction, line);
+    }
 
-      char *jmp = jmp_code(jmp_str(buffer));
-      char *comp = comp_code(comp_str(buffer));
-      char *dest = dest_code(dest_str(buffer));
-
-      char *c_inst = build_c_inst(dest, jmp, comp);
-      write_line(dest_file, c_inst);
-      free(c_inst);
+    fputs((const char *)instruction, dest_file);
+    if (has_more_lines(lr)) {
+      fputc('\n', dest_file);
     }
   }
 
-  fclose(src_file);
+  lr_close(lr);
+  fclose(dest_file);
 
   return 0;
 }
